@@ -1,0 +1,25 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" routerLink="">
+    O
+  </a>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/shopping-cart">Shopping-cart</a>
+      </li>
+      <li class="nav-item">
+        <div ngbDropdown class="d-inline-block">
+          <a class="nav-link" tabindex="0" ngbDropdownToggle id="navbarDropdown1" role="button">
+            Username
+          </a>
+          <div ngbDropdownMenu aria-labelledby="navbarDropdown1">
+            <button ngbDropdownItem>My Orders</button>
+            <button ngbDropdownItem>Manage Orders</button>
+            <button ngbDropdownItem>Manage Products</button>
+            <button ngbDropdownItem>Log Out</button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "demo-shop"
+    }
+  },
+  "defaultProject": "demo-shop",
+  "cli": {
+    "analytics": false
+  }
 }
