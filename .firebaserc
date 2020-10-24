@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "fir-demo-355c7"
+  },
+  "targets": {
+    "fir-demo-355c7": {
+      "hosting": {
+        "demo-shop": [
+          "fir-demo-355c7"
+        ]
+      }
+    }
   }
 }
