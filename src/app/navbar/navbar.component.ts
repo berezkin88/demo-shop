@@ -1,5 +1,7 @@
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AppUser } from './../models/app-user';
+import { AuthService } from './../services/auth.service';
 import { Component } from '@angular/core';
+
 
 @Component({
   selector: 'navbar',
@@ -7,14 +9,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./navbar.component.sass']
 })
 export class NavbarComponent {
+  appUser: AppUser;
 
-  constructor(private $auth: AngularFireAuth) { }
-
-  get auth(): AngularFireAuth {
-    return this.$auth;
+  constructor(private authService: AuthService) {
+    authService.appUser$.subscribe(appUser => this.appUser = appUser);
   }
 
   logout(): void {
-    this.auth.signOut();
+    this.authService.logout();
   }
 }
