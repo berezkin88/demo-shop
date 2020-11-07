@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CustomFormsModule } from 'ng2-validation';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -47,6 +48,7 @@ import { CategoryService } from './services/category.service';
     AppRoutingModule,
     NgbModule,
     FormsModule,
+    CustomFormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'products', component: ProductsComponent },
@@ -57,8 +59,9 @@ import { CategoryService } from './services/category.service';
       { path: 'order-success', component: OrderSuccessComponent, canActivate: [ AuthGuard ] },
       { path: 'my/orders', component: MyOrdersComponent, canActivate: [ AuthGuard ] },
 
-      { path: 'admin/products', component: AdminProductsComponent, canActivate: [ AuthGuard, AdminAuthGuard ] },
       { path: 'admin/products/new', component: ProductFormComponent, canActivate: [ AuthGuard, AdminAuthGuard ] },
+      { path: 'admin/products/:id', component: ProductFormComponent, canActivate: [ AuthGuard, AdminAuthGuard ] },
+      { path: 'admin/products', component: AdminProductsComponent, canActivate: [ AuthGuard, AdminAuthGuard ] },
       { path: 'admin/orders', component: AdminOrdersComponent, canActivate: [ AuthGuard, AdminAuthGuard ] }
     ]),
     AngularFireModule.initializeApp(environment.firebase),
