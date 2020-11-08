@@ -1,1 +1,33 @@
-<p>home works!</p>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="list-group">
+        <a class="list-group-item list-group-item-action active" (click)="filter()">
+          All Categories
+        </a>
+        <a
+          #query
+          *ngFor="let category of categories$ | async"
+          class="list-group-item list-group-item-action"
+          (click)="filter(category.name.toLowerCase())">
+          {{ category.name }}
+        </a>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="row row-cols-1 row-cols-md-2">
+        <div *ngFor="let product of filteredProducts " class="col mb-4">
+          <div class="card" style="width: 24rem;">
+            <img [src]="product.imageUrl" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{ product.title }}</h5>
+              <p class="card-text">{{ product.price | currency:"USD":"symbol" }}</p>
+            </div>
+            <a class="btn btn-primary">Add to Cart</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
