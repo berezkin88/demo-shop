@@ -15,47 +15,44 @@ export class HomeComponent implements OnInit, OnDestroy {
   filteredProducts: Product[] = [];
   subscription: Subscription;
   categories$: Observable<{ name: string }[]>;
-  queryParam: string;
+  category: string;
 
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
-    private route: ActivatedRoute,
-    private router: Router
+    private route: ActivatedRoute
   ) {
-    this.queryParam = this.route.snapshot.queryParamMap.get('category');
     this.subscription = this.productService.getAll().subscribe((products) =>
-      products.forEach((p) => {
-        const prod: Product = p.payload.val();
-        prod.key = p.key;
-        this.filteredProducts.push(prod);
-        this.products.push(prod);
-      })
+    products.forEach((p) => {
+      const prod: Product = p.payload.val();
+      prod.key = p.key;
+      this.filteredProducts.push(prod);
+      this.products.push(prod);
+    })
     );
-    this.categories$ = this.categoryService.getCategories();
+    this.categories$ = this.categoryService.getAll();
+    this.route.queryParamMap.subscribe(params => {
+      this.category = params.get('category');
+      this.filter(this.category);
+    });
   }
 
   ngOnInit(): void {
-    if (this.queryParam) {
-      this.filter(this.queryParam);
-    }
+    // if (this.queryParam) {
+    //   this.filter(this.queryParam);
+    // }
   }
 
   filter(query?): void {
     console.log(query);
     if (!query) {
       this.filteredProducts = this.products;
-      this.router.navigate(['.']);
       return;
     }
     const matcher = this.popFirstWord(query);
     this.filteredProducts = this.products.filter((p) =>
       p.category.includes(matcher)
     );
-    this.router.navigate(['.'], {
-      relativeTo: this.route,
-      queryParams: { category: matcher },
-    });
   }
 
   private popFirstWord(input: string): string {
