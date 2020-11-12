@@ -2,33 +2,12 @@
 <div class="container">
   <div class="row">
     <div class="col-md-3">
-      <div class="list-group">
-        <a class="list-group-item list-group-item-action active" (click)="filter()">
-          All Categories
-        </a>
-        <a
-          #query
-          *ngFor="let c of categories$ | async"
-          routerLink="/"
-          [queryParams]="{ category: c.name.toLowerCase() }"
-          [class.active]="category === c.name.toLowerCase()"
-          class="list-group-item list-group-item-action"
-          (click)="filter(c.name.toLowerCase())">
-          {{ c.name }}
-        </a>
-      </div>
+      <product-filter [category]="category"></product-filter>
     </div>
     <div class="col-md-9">
       <div class="row row-cols-1 row-cols-md-2">
         <div *ngFor="let p of filteredProducts " class="col mb-4">
-          <div class="card" style="width: 24rem;">
-            <img [src]="p.imageUrl" class="card-img-top" alt="...">
-            <div class="card-body">
-              <h5 class="card-title">{{ p.title }}</h5>
-              <p class="card-text">{{ p.price | currency:"USD":"symbol" }}</p>
-            </div>
-            <a class="btn btn-primary">Add to Cart</a>
-          </div>
+          <product-card [product]="p"></product-card>
         </div>
       </div>
     </div>

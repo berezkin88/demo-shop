@@ -1,8 +1,8 @@
+import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CategoryService } from './../services/category.service';
 import { ProductService } from './../services/product.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Component, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Product } from '../models/product';
 
 @Component({
@@ -10,49 +10,40 @@ import { Product } from '../models/product';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.sass'],
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnDestroy {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   subscription: Subscription;
-  categories$: Observable<{ name: string }[]>;
   category: string;
 
   constructor(
     private productService: ProductService,
-    private categoryService: CategoryService,
     private route: ActivatedRoute
   ) {
-    this.subscription = this.productService.getAll().subscribe((products) =>
-    products.forEach((p) => {
-      const prod: Product = p.payload.val();
-      prod.key = p.key;
-      this.filteredProducts.push(prod);
-      this.products.push(prod);
-    })
-    );
-    this.categories$ = this.categoryService.getAll();
-    this.route.queryParamMap.subscribe(params => {
-      this.category = params.get('category');
-      this.filter(this.category);
-    });
+    this.subscription = this.productService
+      .getAll()
+      .pipe(
+        switchMap(
+          products => {
+            products.forEach((p) => {
+            const prod: Product = p.payload.val();
+            prod.key = p.key;
+            this.filteredProducts.push(prod);
+            this.products.push(prod);
+          });
+            return this.route.queryParamMap;
+          }))
+        .subscribe((params) => {
+        this.category = params.get('category');
+        this.filter(this.category);
+      });
   }
 
-  ngOnInit(): void {
-    // if (this.queryParam) {
-    //   this.filter(this.queryParam);
-    // }
-  }
-
-  filter(query?): void {
-    console.log(query);
-    if (!query) {
-      this.filteredProducts = this.products;
-      return;
-    }
-    const matcher = this.popFirstWord(query);
-    this.filteredProducts = this.products.filter((p) =>
-      p.category.includes(matcher)
-    );
+  filter(query): void {
+    this.filteredProducts = query
+      ? this.products.filter((p) =>
+          p.category.includes(this.popFirstWord(query)))
+      : this.products;
   }
 
   private popFirstWord(input: string): string {
