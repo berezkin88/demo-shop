@@ -1,10 +1,11 @@
+import { Product } from './../models/product';
 import { Item } from './../models/item';
 import { Cart } from './../models/cart';
-import { take } from 'rxjs/operators';
+import { take, map } from 'rxjs/operators';
 import { AngularFireDatabase, AngularFireObject } from '@angular/fire/database';
 import { Injectable } from '@angular/core';
 import { database } from 'firebase';
-import { Product } from '../models/product';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,13 +17,21 @@ export class ShoppingCartService {
   private create(): database.ThenableReference {
     return this.db.list<Cart>('/shopping-carts').push({
       dateCreated: new Date().getTime(),
-      items: null
+      itemsMap: null,
+      items: null,
+      totalPrice: null,
+      totalItemsCount: null,
+      getQuantity: null
     });
   }
 
-  async getCart(): Promise<AngularFireObject<Cart>> {
+  async getCart(): Promise<Observable<Cart>> {
     const cartId = await this.getOrCreateCartId();
-    return this.db.object<Cart>(`/shopping-carts/${cartId}`);
+    return this.db.object<{ dateCreated: number, items: {} }>(`/shopping-carts/${cartId}`)
+      .valueChanges()
+      .pipe(
+        map(x => new Cart(x.items))
+      );
   }
 
   private async getOrCreateCartId(): Promise<string> {

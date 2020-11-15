@@ -44,7 +44,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.subscription.add((await this.shoppingCartService.getCart()).valueChanges().subscribe(cart => this.cart = cart));
+    this.subscription.add((await this.shoppingCartService.getCart()).subscribe(cart => this.cart = cart));
   }
 
   filter(query): void {
