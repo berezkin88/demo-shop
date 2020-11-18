@@ -5,10 +5,11 @@ export class Cart {
   dateCreated: number;
   items: Item[] = [];
 
-  constructor(public itemsMap: { [productId: string]: Item }) {
+  constructor(private itemsMap: { [productId: string]: Item }) {
+    this.itemsMap = itemsMap || {};
     for (const productId in itemsMap) {
       let item = itemsMap[productId];
-      this.items.push(new Item(item.product, item.quantity));
+      this.items.push(new Item({ ...item, key: productId }));
     }
   }
 
@@ -20,7 +21,7 @@ export class Cart {
   get totalPrice(): number {
     let sum = 0;
       for (const item of this.items) {
-        sum += item.product.price * item.quantity;
+        sum += item.price * item.quantity;
       }
     return sum;
   }

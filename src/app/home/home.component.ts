@@ -1,10 +1,10 @@
 import { Cart } from './../models/cart';
 import { ShoppingCartService } from './../services/shopping-cart.service';
 import { switchMap } from 'rxjs/operators';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ProductService } from './../services/product.service';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Product } from '../models/product';
 
 @Component({
@@ -12,45 +12,49 @@ import { Product } from '../models/product';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.sass'],
 })
-export class HomeComponent implements OnDestroy, OnInit {
+export class HomeComponent implements OnInit {
   products: Product[] = [];
   filteredProducts: Product[] = [];
-  subscription: Subscription;
   category: string;
   cart: Cart;
+  cart$: Observable<Cart>;
 
   constructor(
     private productService: ProductService,
     private route: ActivatedRoute,
     private shoppingCartService: ShoppingCartService
-  ) {
-    this.subscription = this.productService
-      .getAll()
-      .pipe(
-        switchMap(
-          products => {
-            products.forEach((p) => {
-            const prod: Product = p.payload.val();
-            prod.key = p.key;
-            this.filteredProducts.push(prod);
-            this.products.push(prod);
-          });
-            return this.route.queryParamMap;
-          }))
-        .subscribe((params) => {
-        this.category = params.get('category');
-        this.filter(this.category);
-      });
-  }
+  ) { }
 
   async ngOnInit(): Promise<void> {
-    this.subscription.add((await this.shoppingCartService.getCart()).subscribe(cart => this.cart = cart));
+    this.cart$ = await this.shoppingCartService.getCart();
+
+    this.populateProducts();
   }
 
-  filter(query): void {
-    this.filteredProducts = query
+  private populateProducts(): void {
+    this.productService
+    .getAll()
+    .pipe(
+      switchMap(
+        products => {
+          products.forEach((p) => {
+          const prod: Product = p.payload.val();
+          prod.key = p.key;
+          this.filteredProducts.push(prod);
+          this.products.push(prod);
+        });
+          return this.route.queryParamMap;
+        }))
+      .subscribe((params) => {
+      this.category = params.get('category');
+      this.filter();
+    });
+  }
+
+  private filter(): void {
+    this.filteredProducts = this.category
       ? this.products.filter((p) =>
-          p.category.includes(this.popFirstWord(query)))
+        p.category.includes(this.popFirstWord(this.category)))
       : this.products;
   }
 
@@ -59,9 +63,5 @@ export class HomeComponent implements OnDestroy, OnInit {
       return;
     }
     return input.split(' ', 1)[0];
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

@@ -8,30 +8,36 @@ import { database } from 'firebase';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ShoppingCartService {
-
-  constructor(private db: AngularFireDatabase) { }
-
-  private create(): database.ThenableReference {
-    return this.db.list<Cart>('/shopping-carts').push({
-      dateCreated: new Date().getTime(),
-      itemsMap: null,
-      items: null,
-      totalPrice: null,
-      totalItemsCount: null,
-      getQuantity: null
-    });
-  }
+  constructor(private db: AngularFireDatabase) {}
 
   async getCart(): Promise<Observable<Cart>> {
     const cartId = await this.getOrCreateCartId();
-    return this.db.object<{ dateCreated: number, items: {} }>(`/shopping-carts/${cartId}`)
+    return this.db
+      .object<{ dateCreated: number; items: {} }>(`/shopping-carts/${cartId}`)
       .valueChanges()
-      .pipe(
-        map(x => new Cart(x.items))
-      );
+      .pipe(map((x) => new Cart(x.items)));
+  }
+
+  async addToCart(product: Product): Promise<void> {
+    this.updateItem(product, 1);
+  }
+
+  async removeFromCart(product: Product): Promise<void> {
+    this.updateItem(product, -1);
+  }
+
+  async clearCart(): Promise<void> {
+    const cartId = await this.getOrCreateCartId();
+    this.db.object(`/shopping-carts/${cartId}/items`).remove();
+  }
+
+  private create(): database.ThenableReference {
+    return this.db.list('/shopping-carts').push({
+      dateCreated: new Date().getTime()
+    });
   }
 
   private async getOrCreateCartId(): Promise<string> {
@@ -45,22 +51,29 @@ export class ShoppingCartService {
   }
 
   private getItem(cartId: string, productKey: string): AngularFireObject<Item> {
-    return this.db.object<Item>(`/shopping-carts/${cartId}/items/${productKey}`);
+    return this.db.object<Item>(
+      `/shopping-carts/${cartId}/items/${productKey}`
+    );
   }
 
-  async addToCart(product: Product): Promise<void> {
-    this.updateItemQuantity(product, 1);
-  }
-
-  async removeFromCart(product: Product): Promise<void>  {
-    this.updateItemQuantity(product, -1);
-  }
-
-  private async updateItemQuantity(product: Product, change: number): Promise<void> {
+  private async updateItem(product: Product, change: number): Promise<void> {
     const cartId = await this.getOrCreateCartId();
     const item$ = this.getItem(cartId, product.key);
-    item$.valueChanges().pipe(take(1)).subscribe(item => {
-      item$.update({ product, quantity: (item === null ? 0 : item.quantity) + change});
-    });
+    item$
+      .valueChanges()
+      .pipe(take(1))
+      .subscribe((item) => {
+        let quant = (item === null ? 0 : item.quantity) + change;
+        if (quant === 0) {
+          item$.remove();
+        } else {
+          item$.update({
+            title: product.title,
+            imageUrl: product.imageUrl,
+            price: product.price,
+            quantity: (item === null ? 0 : item.quantity) + change,
+          });
+        }
+      });
   }
 }
