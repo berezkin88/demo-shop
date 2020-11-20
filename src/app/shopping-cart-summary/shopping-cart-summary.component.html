@@ -1,0 +1,25 @@
+
+<div class="card col">
+  <div class="card-body">
+    <h5 class="card-title">Order Summary</h5>
+    <p class="card-text">You have {{ cart.totalItemsCount }} items int your shopping cart.</p>
+    <table class="table">
+      <tr *ngFor="let item of cart.items" >
+        <td>
+          {{ item.quantity }} x {{ item.title }}
+        </td>
+        <td>
+          {{ item.totalPrice | currency:"USD":"symbol" }}
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Total
+        </th>
+        <th>
+          {{ cart.totalPrice | currency:"USD":"symbol" }}
+        </th>
+      </tr>
+    </table>
+  </div>
+</div>

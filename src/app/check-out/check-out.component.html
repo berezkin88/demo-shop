@@ -4,61 +4,9 @@
 </h1>
 <div class="row" *ngIf="cart$ | async as cart" >
   <div class="col">
-    <form #f="ngForm" (ngSubmit)="checkOut(f.value)" >
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input #name="ngModel" ngModel type="text" id="name" name="name" class="form-control" required>
-        <div class="alert alert-danger" *ngIf="name.touched && name.invalid">
-          Name is required.
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="name">Address</label>
-        <input #address="ngModel" ngModel type="text" placeholder="Line 1" id="adress" name="address" class="form-control" required>
-        <div class="alert alert-danger" *ngIf="address.touched && address.invalid">
-          Address is required.
-        </div>
-      </div>
-      <div class="form-group">
-        <input ngModel type="text" placeholder="Line 2" id="adress" name="address" class="form-control" required>
-      </div>
-      <div class="form-group">
-        <label for="name">City</label>
-        <input #city="ngModel" ngModel type="text" id="city" name="city" class="form-control" required>
-        <div class="alert alert-danger" *ngIf="city.touched && city.invalid">
-          City is required.
-        </div>
-      </div>
-      <button class="btn btn-primary" [disabled]="!f.valid" >Place Order</button>
-    </form>
+    <shipping-form [cart]="cart"></shipping-form>
   </div>
   <div class="col">
-    <div class="card col">
-      <div class="card-body">
-        <h5 class="card-title">Order Summary</h5>
-        <p class="card-text">You have {{ cart.totalItemsCount }} items int your shopping cart.</p>
-        <table class="table">
-          <tr *ngFor="let item of cart.items" >
-            <td>
-              {{ item.quantity }} x {{ item.title }}
-            </td>
-            <td>
-              {{ item.totalPrice | currency:"USD":"symbol" }}
-            </td>
-          </tr>
-          <tr>
-            <th>
-              Total
-            </th>
-            <th>
-              {{ cart.totalPrice | currency:"USD":"symbol" }}
-            </th>
-          </tr>
-        </table>
-      </div>
-    </div>
+    <shopping-cart-summary [cart]="cart"></shopping-cart-summary>
   </div>
-  <p>
-    {{ cart | json }}
-  </p>
 </div>
